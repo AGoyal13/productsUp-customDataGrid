@@ -1,0 +1,25 @@
+<footer>
+    <!--products per page-->
+    <section>
+        <div class="page-dropdown">
+            <label for="productCount">Products per page</label>
+            <select id="productCount" class="page-size-select" (change)="changeRowsPerPage($event)">
+                <option *ngFor="let page of countPerPage trackBy: getId" [value]="page" >{{page}}</option>            
+            </select>
+        </div>
+    </section>
+    <!--pagination-->
+    <nav aria-label="pagination">
+        <ul class="pagination">
+            <li class="page-item page-change" [ngClass]="{ 'disabled': currentPage === 1 }">
+                <span class="page-link" (click)="changePage(currentPage - 1)" aria-label="previous">&laquo;</span>
+            </li>
+            <li class="page-item">
+                <a class="page-link active">{{currentPage +  ' / ' + totalPage}}</a>
+            </li>
+          <li class="page-item" [ngClass]="{ 'disabled': currentPage === totalPage }">
+            <a class="page-link page-change" (click)="changePage(currentPage + 1)" aria-label="next">&raquo;</a>
+          </li>
+        </ul>
+    </nav>
+</footer>

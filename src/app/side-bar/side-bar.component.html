@@ -1,0 +1,32 @@
+<div class="side-bar-wrapper">
+    <div class="text-center">
+        <h3>Filters</h3>
+        <button type="button" class="btn btn-primary" (click)="addFilter()">Add Filter</button>
+    </div>
+    <div [formGroup]="filterForm" class="p-10">
+        <div formArrayName="formFilters">        
+            <div class="mt-2" *ngFor="let filterGroup of formFilters.controls; let i = index">
+                <div [formGroupName]="i">
+                    <label>#{{i+1}} </label>
+                    <select class="form-select m-b-5" aria-label="Select Column" formControlName="column_name">
+                        <option selected disabled value="">Choose Column</option>
+                        <option *ngFor="let name of columnsForFilter" value="{{name}}">{{name}}</option>
+                    </select>
+                    <fieldset [disabled]="!filterGroup?.value?.column_name">
+                        <select class="form-select m-b-5" aria-label="Select Operator" formControlName="operator" [disabled]="!filterGroup?.value?.column_name">
+                            <option selected disabled value="">Choose Filter</option>
+                            <option *ngFor="let operator of filterDropdownMap[filterGroup?.value?.column_name]" value="{{operator}}">{{operator}}</option>
+                        </select>
+                    </fieldset>
+                    <fieldset [disabled]="!filterGroup?.value?.operator">
+                        <input formControlName="value" type="text" class="form-control m-b-5" placeholder="Enter Value" aria-label="Value">
+                    </fieldset>
+                    <button [disabled]="!filterGroup?.value?.operator" type="button" class="btn btn-danger m-b-5" (click)="removeFilter(i)">Remove Filter</button>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4" *ngIf="!!formFilters.controls.length">
+            <button type="button" [disabled]="!filterForm.valid" class="btn btn-primary" (click)="applyFilter()">Apply</button>
+        </div>
+    </div>
+</div>

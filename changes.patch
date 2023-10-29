@@ -1,0 +1,721 @@
+diff --git a/src/app/app.component.scss b/src/app/app.component.scss
+index e69de29..fd55311 100644
+--- a/src/app/app.component.scss
++++ b/src/app/app.component.scss
+@@ -0,0 +1,3 @@
++h1 {
++    text-transform: uppercase;
++}
+\ No newline at end of file
+diff --git a/src/app/app.component.spec.ts b/src/app/app.component.spec.ts
+index 7add125..6b80313 100644
+--- a/src/app/app.component.spec.ts
++++ b/src/app/app.component.spec.ts
+@@ -25,11 +25,4 @@ describe('AppComponent', () => {
+     const app = fixture.componentInstance;
+     expect(app.title).toEqual('customTableFilter');
+   });
+-
+-  it('should render title', () => {
+-    const fixture = TestBed.createComponent(AppComponent);
+-    fixture.detectChanges();
+-    const compiled = fixture.nativeElement;
+-    expect(compiled.querySelector('.content span').textContent).toContain('customTableFilter app is running!');
+-  });
+ });
+diff --git a/src/app/app.module.ts b/src/app/app.module.ts
+index 0b1b382..3acfad5 100644
+--- a/src/app/app.module.ts
++++ b/src/app/app.module.ts
+@@ -6,7 +6,9 @@ import { AppComponent } from './app.component';
+ import { DashboardComponent } from './dashboard/dashboard.component';
+ import { SideBarComponent } from './side-bar/side-bar.component';
+ import { TableViewComponent } from './table-view/table-view.component';
+-import { FormsModule } from '@angular/forms';
++import { FormsModule, ReactiveFormsModule } from '@angular/forms';
++import { FilterDataPipe } from './filter-data.pipe';
++import { PaginationComponent } from './pagination/pagination.component';
+ 
+ @NgModule({
+   declarations: [
+@@ -14,8 +16,10 @@ import { FormsModule } from '@angular/forms';
+     DashboardComponent,
+     SideBarComponent,
+     TableViewComponent,
++    FilterDataPipe,
++    PaginationComponent,
+   ],
+-  imports: [BrowserModule, AppRoutingModule, FormsModule],
++  imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
+   providers: [],
+   bootstrap: [AppComponent],
+ })
+diff --git a/src/app/dashboard/dashboard.component.html b/src/app/dashboard/dashboard.component.html
+index c2777d6..77fbbaf 100644
+--- a/src/app/dashboard/dashboard.component.html
++++ b/src/app/dashboard/dashboard.component.html
+@@ -1,6 +1,4 @@
+-<div class="container">
+-    <div class="row">
+-        <app-side-bar class="col-2" (updateFilters)="filters($event)"></app-side-bar>
+-        <app-table-view class="col-10" [data]="records"></app-table-view>
+-    </div>
++<div class="fl-container">
++    <app-side-bar class="side-bar" (updateFilters)="filters($event)"></app-side-bar>
++    <app-table-view class="data-grid" [data]="records"></app-table-view>
+ </div>
+\ No newline at end of file
+diff --git a/src/app/dashboard/dashboard.component.scss b/src/app/dashboard/dashboard.component.scss
+index b284b69..146f4a9 100644
+--- a/src/app/dashboard/dashboard.component.scss
++++ b/src/app/dashboard/dashboard.component.scss
+@@ -1,6 +1,27 @@
+-app-side-bar {
++.side-bar {
+     background-color: lightgray;
++    width: 20%;
+ }
+-.container {
+-    margin: 0;
+-}
+\ No newline at end of file
++.data-grid {
++    width: 75%;
++}
++.fl-container {
++    display: flex;
++    justify-content: center;
++    margin: 25px;
++}
++
++@media screen and (max-width: 425px) {
++    .fl-container {
++        display: flex;
++        flex-direction: column;
++    }
++    .side-bar {
++        background-color: lightgray;
++        width: 100%;
++    }
++    .data-grid {
++        width: 100%;
++    }
++}
++
+diff --git a/src/app/dashboard/dashboard.component.spec.ts b/src/app/dashboard/dashboard.component.spec.ts
+index 5ec4ff8..874ac74 100644
+--- a/src/app/dashboard/dashboard.component.spec.ts
++++ b/src/app/dashboard/dashboard.component.spec.ts
+@@ -22,4 +22,68 @@ describe('DashboardComponent', () => {
+   it('should create', () => {
+     expect(component).toBeTruthy();
+   });
++
++  describe('filters',()=> {
++    it('should filter content based on 1 filter for checking equality', () => {
++      let records = [{"id": 1,
++      "gtin": 99014233738092,
++      "product_name": "Dimethicone, Avobenzone, Octinoxate, Octocrylene",
++      "product_desc": "Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis.",
++      "price": 90.18,
++      "currency": "CNY",
++      "category": "Nivea A Kiss of Recovery Medicated Lip Care",
++      "gender": "",
++      "quantity": 15,
++      "size": "",
++      "style": "architecture",
++      "color": "Purple",
++      "url": "http://fastcompany.com/ultrices/erat/tortor.js?a=condimentum&pede=id&posuere=luctus&nonummy=nec&integer=molestie&non=sed&velit=justo&donec=pellentesque&diam=viverra&neque=pede&vestibulum=ac&eget=diam&vulputate=cras&ut=pellentesque&ultrices=volutpat&vel=dui&augue=maecenas&vestibulum=tristique&ante=est&ipsum=et&primis=tempus&in=semper&faucibus=est&orci=quam&luctus=pharetra&et=magna&ultrices=ac&posuere=consequat&cubilia=metus&curae=sapien&donec=ut&pharetra=nunc",
++      "image": "http://dummyimage.com/249x203.jpg/ff4444/ffffff",
++      "image_additional": "http://dummyimage.com/157x160.jpg/ff4444/ffffff",
++      "additional": "test",
++      "source_video": "http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm"}];
++      let filtersArr = [{column_name: 'gtin', operator: 'equals', value: '99014233738092'}];
++      component.filters(filtersArr);
++      expect(component.records).toEqual(records);
++    });
++    it('should not filter content for invalid filter', () => {
++      let records: any = [];
++      let filtersArr = [{column_name: 'wrongFilter', operator: 'wrongFilter', value: '99014233738092'}, {column_name: 'currency', operator: 'equals', value: 'CNY'}, {column_name: 'currency', operator: 'contains', value: 'CNY'}];
++      component.filters(filtersArr);
++      expect(component.records).toEqual(records);
++    });
++    it('should filter content for multiple filters for checking equality', () => {
++      let records = [{"id": 1,
++      "gtin": 99014233738092,
++      "product_name": "Dimethicone, Avobenzone, Octinoxate, Octocrylene",
++      "product_desc": "Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis.",
++      "price": 90.18,
++      "currency": "CNY",
++      "category": "Nivea A Kiss of Recovery Medicated Lip Care",
++      "gender": "",
++      "quantity": 15,
++      "size": "",
++      "style": "architecture",
++      "color": "Purple",
++      "url": "http://fastcompany.com/ultrices/erat/tortor.js?a=condimentum&pede=id&posuere=luctus&nonummy=nec&integer=molestie&non=sed&velit=justo&donec=pellentesque&diam=viverra&neque=pede&vestibulum=ac&eget=diam&vulputate=cras&ut=pellentesque&ultrices=volutpat&vel=dui&augue=maecenas&vestibulum=tristique&ante=est&ipsum=et&primis=tempus&in=semper&faucibus=est&orci=quam&luctus=pharetra&et=magna&ultrices=ac&posuere=consequat&cubilia=metus&curae=sapien&donec=ut&pharetra=nunc",
++      "image": "http://dummyimage.com/249x203.jpg/ff4444/ffffff",
++      "image_additional": "http://dummyimage.com/157x160.jpg/ff4444/ffffff",
++      "additional": "test",
++      "source_video": "http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm"}];
++      let filtersArr = [{column_name: 'gtin', operator: 'equals', value: '99014233738092'},
++        {column_name: 'price', operator: 'greater than or equal to', value: '90.18'},  
++        {column_name: 'currency', operator: 'not contain', value: 'EUR'}, 
++        {column_name: 'quantity', operator: 'less than or equal to', value: 15},
++        {column_name: 'product_name', operator: 'contains', value: 'Dimethicone'},
++        {column_name: 'gender', operator: 'not equal', value: 'M'}
++      ];
++      component.filters(filtersArr);
++      expect(component.records).toEqual(records);
++    });
++    it('should not filter content for no filters passed', () => {
++      let filtersArr: any = [];
++      component.filters(filtersArr);
++      expect(component.records).toEqual(component.originalData);
++    });
++  })
+ });
+diff --git a/src/app/dashboard/dashboard.component.ts b/src/app/dashboard/dashboard.component.ts
+index aeca682..50cf440 100644
+--- a/src/app/dashboard/dashboard.component.ts
++++ b/src/app/dashboard/dashboard.component.ts
+@@ -1,6 +1,7 @@
+ import { Component, OnInit } from '@angular/core';
+ import { tableData } from '../data/data';
+ import { Filter } from '../models/filter';
++import { Product } from '../models/product';
+ 
+ @Component({
+   selector: 'app-dashboard',
+@@ -9,19 +10,31 @@ import { Filter } from '../models/filter';
+ })
+ export class DashboardComponent implements OnInit {
+   constructor() {}
+-  records: any[] = [];
+-  originalData: any[] = Object.values(tableData);
++  records: Product[] = [];
++  originalData: Product[] = Object.values(tableData);
+ 
+   ngOnInit(): void {
+     this.records = [...this.originalData];
+   }
+ 
+   filters(filtersArr: any) {
+-    filtersArr.forEach((_filter: Filter) => {
+-      this.records = this.records.filter((record) => {
+-        return this.checkRecord(record, _filter);
++    if (filtersArr.length > 1) {
++      filtersArr.forEach((_filter: Filter) => {
++        this.records = this.records.filter((record) => {
++          return this.checkRecord(record, _filter);
++        });
++        // console.log(this.records);
+       });
+-    });
++    } else if (filtersArr.length === 1) {
++      filtersArr.forEach((_filter: Filter) => {
++        this.records = this.originalData.filter((record) => {
++          return this.checkRecord(record, _filter);
++        });
++      });
++    }
++    else {
++      this.records = this.originalData;
++    }
+   }
+ 
+   checkRecord(record: any, _filter: Filter) {
+@@ -34,10 +47,10 @@ export class DashboardComponent implements OnInit {
+         valid = record[_filter.column_name] != _filter.value;
+         break;
+       case 'contains':
+-        valid = record[_filter.column_name].contains(_filter.value);
++        valid = record[_filter.column_name].indexOf(_filter.value) > -1;
+         break;
+       case 'not contain':
+-        valid = !record[_filter.column_name].contains(_filter.value);
++        valid = record[_filter.column_name].indexOf(_filter.value) === -1;
+         break;
+       case 'less than or equal to':
+         valid = record[_filter.column_name] <= _filter.value;
+diff --git a/src/app/data/data.ts b/src/app/data/data.ts
+index 3ecf373..684ad5c 100644
+--- a/src/app/data/data.ts
++++ b/src/app/data/data.ts
+@@ -56999,4 +56999,32 @@ export const tableData =  {
+       "additional": "¡™£¢∞§¶•ªº–≠",
+       "source_video": "http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm"
+     }
+-  };
+\ No newline at end of file
++  };
++
++  export const filterDropdownMap: any = {
++    'gtin': ['equals', 'not equal', 'contains', 'not contain'],
++    'product_name': ['equals', 'not equal', 'contains', 'not contain'],
++    'product_desc': ['equals', 'not equal', 'contains', 'not contain'],
++    'price': ['equals', 'not equal', 'less than or equal to','greater than or equal to'],
++    'currency': ['equals', 'not equal', 'less than or equal to','greater than or equal to'],
++    'category': ['equals', 'not equal', 'contains', 'not contain'],
++    'gender': ['equals', 'not equal', 'contains', 'not contain'],
++    'quantity': ['equals', 'not equal', 'less than or equal to','greater than or equal to'],
++    'size': ['equals', 'not equal', 'contains', 'not contain'],
++    'style': ['equals', 'not equal', 'contains', 'not contain'],
++    'color': ['equals', 'not equal', 'contains', 'not contain'],
++  };
++
++  export const columnsForFilter: string[] = [
++    'gtin',
++    'product_name',
++    'product_desc',
++    'price',
++    'currency',
++    'category',
++    'gender',
++    'quantity',
++    'size',
++    'style',
++    'color',
++  ];
+\ No newline at end of file
+diff --git a/src/app/models/filter.ts b/src/app/models/filter.ts
+index 7195409..34a9790 100644
+--- a/src/app/models/filter.ts
++++ b/src/app/models/filter.ts
+@@ -1,10 +1,5 @@
+-export class Filter {
+-    column_name: string;
+-    operator: string;
+-    value: any
+-    constructor() {
+-      this.column_name = '';
+-      this.operator = '';
+-      this.value = '';
+-    }
+-  }
+\ No newline at end of file
++export interface Filter {
++  column_name: string;
++  operator: string;
++  value: any
++}
+\ No newline at end of file
+diff --git a/src/app/side-bar/side-bar.component.html b/src/app/side-bar/side-bar.component.html
+index 6a33b63..0bc1039 100644
+--- a/src/app/side-bar/side-bar.component.html
++++ b/src/app/side-bar/side-bar.component.html
+@@ -1,20 +1,32 @@
+-<div class="text-center">
+-    <h3>Filters</h3>
+-    <button type="button" class="btn btn-primary" (click)="addFilter()">Add Filter</button>
+-</div>
+-<div class="mt-2" *ngFor="let filter of filters; index as i">
+-    <label>#{{i+1}} </label>
+-    <select class="form-select" aria-label="Select Column" [(ngModel)]="filters[i].column_name"
+-        (change)="onChange($event)">
+-        <option selected disabled value="">Choose Column</option>
+-        <option *ngFor="let name of columnsForFilter" value="{{name}}">{{name}}</option>
+-    </select>
+-    <select class="form-select" aria-label="Select Operator" [(ngModel)]="filters[i].operator">
+-        <option elected disabled value="">Choose Operator</option>
+-        <option *ngFor="let operator of operators" value="{{operator}}">{{operator}}</option>
+-    </select>
+-    <input type="text" class="form-control" placeholder="Enter Value" aria-label="Value" [(ngModel)]="filters[i].value">
+-</div>
+-<div class="text-center mt-4" *ngIf="!!filters.length">
+-    <button type="button" class="btn btn-primary" (click)="applyFilter()">Apply</button>
++<div class="side-bar-wrapper">
++    <div class="text-center">
++        <h3>Filters</h3>
++        <button type="button" class="btn btn-primary" (click)="addFilter()">Add Filter</button>
++    </div>
++    <div [formGroup]="filterForm" class="p-10">
++        <div formArrayName="formFilters">        
++            <div class="mt-2" *ngFor="let filterGroup of formFilters.controls; let i = index">
++                <div [formGroupName]="i">
++                    <label>#{{i+1}} </label>
++                    <select class="form-select m-b-5" aria-label="Select Column" formControlName="column_name">
++                        <option selected disabled value="">Choose Column</option>
++                        <option *ngFor="let name of columnsForFilter" value="{{name}}">{{name}}</option>
++                    </select>
++                    <fieldset [disabled]="!filterGroup?.value?.column_name">
++                        <select class="form-select m-b-5" aria-label="Select Operator" formControlName="operator" [disabled]="!filterGroup?.value?.column_name">
++                            <option selected disabled value="">Choose Filter</option>
++                            <option *ngFor="let operator of filterDropdownMap[filterGroup?.value?.column_name]" value="{{operator}}">{{operator}}</option>
++                        </select>
++                    </fieldset>
++                    <fieldset [disabled]="!filterGroup?.value?.operator">
++                        <input formControlName="value" type="text" class="form-control m-b-5" placeholder="Enter Value" aria-label="Value">
++                    </fieldset>
++                    <button [disabled]="!filterGroup?.value?.operator" type="button" class="btn btn-danger m-b-5" (click)="removeFilter(i)">Remove Filter</button>
++                </div>
++            </div>
++        </div>
++        <div class="text-center mt-4" *ngIf="!!formFilters.controls.length">
++            <button type="button" [disabled]="!filterForm.valid" class="btn btn-primary" (click)="applyFilter()">Apply</button>
++        </div>
++    </div>
+ </div>
+\ No newline at end of file
+diff --git a/src/app/side-bar/side-bar.component.scss b/src/app/side-bar/side-bar.component.scss
+index e69de29..ee34f77 100644
+--- a/src/app/side-bar/side-bar.component.scss
++++ b/src/app/side-bar/side-bar.component.scss
+@@ -0,0 +1,11 @@
++.side-bar-wrapper {
++    max-height: 520px;
++    overflow: auto;
++}
++select:disabled, select[disabled] {
++    cursor:not-allowed;
++}
++
++input:disabled, input[disabled] {
++    cursor:not-allowed;
++}
+\ No newline at end of file
+diff --git a/src/app/side-bar/side-bar.component.spec.ts b/src/app/side-bar/side-bar.component.spec.ts
+index f039313..cedbecc 100644
+--- a/src/app/side-bar/side-bar.component.spec.ts
++++ b/src/app/side-bar/side-bar.component.spec.ts
+@@ -1,4 +1,5 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
++import { ReactiveFormsModule } from '@angular/forms';
+ 
+ import { SideBarComponent } from './side-bar.component';
+ 
+@@ -8,7 +9,8 @@ describe('SideBarComponent', () => {
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      declarations: [ SideBarComponent ]
++      declarations: [ SideBarComponent ],
++      imports: [ReactiveFormsModule]
+     })
+     .compileComponents();
+   });
+@@ -22,4 +24,28 @@ describe('SideBarComponent', () => {
+   it('should create', () => {
+     expect(component).toBeTruthy();
+   });
++
++  describe('addFilter',()=>{
++    it('should add formGroup to formArray', ()=> {
++      component.addFilter();
++      expect(component.formFilters.length).toEqual(1);
++    })
++  });
++
++  describe('removeFilter',()=>{
++    it('should remove formGroup at particular index of formArray and call applyFilter if formarray has single group', ()=> {
++
++      component.addFilter();
++      component.removeFilter(0);
++      expect(component.formFilters.length).toEqual(0);
++    });
++    it('should remove formGroup at particular index of formArray and should not call applyFilter if formarray has multiple groups', ()=> {
++      component.addFilter();
++      component.addFilter();
++      let applyFilterSpy = spyOn(component,'applyFilter');
++      component.removeFilter(0);
++      expect(component.formFilters.length).toEqual(1);
++      expect(applyFilterSpy).not.toHaveBeenCalled();
++    })
++  });
+ });
+diff --git a/src/app/side-bar/side-bar.component.ts b/src/app/side-bar/side-bar.component.ts
+index 5139542..c1dc321 100644
+--- a/src/app/side-bar/side-bar.component.ts
++++ b/src/app/side-bar/side-bar.component.ts
+@@ -1,5 +1,6 @@
+ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+-import { Filter } from '../models/filter';
++import { FormArray, FormBuilder, Validators } from '@angular/forms';
++import { columnsForFilter, filterDropdownMap } from '../data/data';
+ 
+ @Component({
+   selector: 'app-side-bar',
+@@ -7,41 +8,38 @@ import { Filter } from '../models/filter';
+   styleUrls: ['./side-bar.component.scss'],
+ })
+ export class SideBarComponent implements OnInit {
+-  constructor() {}
+-
+-  filters: any = [];
+-  columnsForFilter: string[] = [
+-    'gtin',
+-    'product_name',
+-    'product_desc',
+-    'price',
+-    'currency',
+-    'category',
+-    'gender',
+-    'quantity',
+-    'size',
+-    'style',
+-    'color',
+-  ];
+-
+-  operators: any = [
+-    'equals',
+-    'not equal',
+-    'contains',
+-    'not contain',
+-    'less than or equal to',
+-    'greater than or equal to',
+-  ];
+-
+-  @Output() updateFilters = new EventEmitter<string>();
++  filterForm = this.fb.group({
++    formFilters: this.fb.array([
++    ])
++  });
++  get formFilters () {
++    return this.filterForm.get('formFilters') as FormArray;
++  }
++  filterDropdownMap = filterDropdownMap;
++  columnsForFilter = columnsForFilter;
++  @Output() updateFilters = new EventEmitter<any>();
++ 
++  constructor(public fb: FormBuilder) {}
+ 
+   ngOnInit(): void {}
+ 
+   addFilter() {
+-    this.filters.push(new Filter());
++    const filterGroup = this.fb.group({
++      column_name: ['', Validators.required],
++      operator: ['', Validators.required],
++      value: ['', Validators.required]
++  });
++  this.formFilters.push(filterGroup);
++  }
++
++  removeFilter(lessonIndex: number) {
++    this.formFilters.removeAt(lessonIndex);
++    if (this.filterForm?.get('formFilters')?.value?.length === 0) {
++      this.applyFilter();
++    }
+   }
+ 
+   applyFilter() {
+-    this.updateFilters.emit(this.filters);
++    this.updateFilters.emit(this.filterForm.get('formFilters')?.value);
+   }
+ }
+diff --git a/src/app/table-view/table-view.component.html b/src/app/table-view/table-view.component.html
+index f0e9758..7b13662 100644
+--- a/src/app/table-view/table-view.component.html
++++ b/src/app/table-view/table-view.component.html
+@@ -1,11 +1,11 @@
+-<div>
+-    <table class="table table-bordered border-primary table-hover">
++<section class="table-wrapper">
++    <table class="table table-bordered table-hover">
+         <thead>
+             <tr>
+                 <th scope="col">#</th>
+                 <th scope="col">gtin</th>
+-                <th scope="col">product_name</th>
+-                <th scope="col">product_desc</th>
++                <th scope="col">product name</th>
++                <th scope="col">product desc</th>
+                 <th scope="col">price</th>
+                 <th scope="col">currency</th>
+                 <th scope="col">category</th>
+@@ -18,8 +18,8 @@
+             </tr>
+         </thead>
+         <tbody>
+-            <tr *ngFor="let item of data; index as i">
+-                <th scope="row">{{item.id}}</th>
++            <tr *ngFor="let item of data | filterData : currentPage : rowsPerPage; trackBy: getId; let i = index">
++                <td scope="row">{{item.id}}</td>
+                 <td>
+                     <div data-toggle="tooltip" data-placement="right" title={{item.gtin}}>
+                         {{item.gtin}}
+@@ -60,4 +60,28 @@
+             </tr>
+         </tbody>
+     </table>
+-</div>
+\ No newline at end of file
++</section>
++<app-pagination [productCount]="productCount" [currentPage]="currentPage" [totalPage]="totalPage" (changePageNumber)="changePage($event)" (rowsPerPage)="changeRowsPerPage($event)"></app-pagination>
++<!-- <footer>
++    <section>
++        <div class="page-dropdown">
++            <label for="productCount">Products per page</label>
++            <select id="productCount" class="page-size-select" (change)="changeRowsPerPage($event)">
++                <option *ngFor="let page of productCount trackBy: getId" [value]="page" >{{page}}</option>            
++            </select>
++        </div>
++    </section>
++    <nav aria-label="pagination">
++        <ul class="pagination">
++            <li class="page-item page-change" [ngClass]="{ 'disabled': currentPage === 1 }">
++                <span class="page-link" (click)="changePage(currentPage - 1)" aria-label="previous">&laquo;</span>
++            </li>
++            <li class="page-item">
++                <a class="page-link active">{{currentPage +  ' / ' + totalPage}}</a>
++            </li>
++          <li class="page-item" [ngClass]="{ 'disabled': currentPage === totalPage }">
++            <a class="page-link page-change" (click)="changePage(currentPage + 1)" aria-label="next">&raquo;</a>
++          </li>
++        </ul>
++    </nav>
++</footer> -->
+\ No newline at end of file
+diff --git a/src/app/table-view/table-view.component.scss b/src/app/table-view/table-view.component.scss
+index e9ce95d..7428a37 100644
+--- a/src/app/table-view/table-view.component.scss
++++ b/src/app/table-view/table-view.component.scss
+@@ -5,4 +5,23 @@ table {
+         overflow: hidden;
+         text-overflow: ellipsis;
+     }
++    margin: 0;
++}
++th {
++    text-transform: uppercase;
++    text-align: center;
++    background-color: inherit;
++}
++td {
++    background-color: inherit;
++}
++.table-wrapper {
++    height: 520px;
++    overflow-x: scroll;
++    overflow-y: scroll;
++    border: 2px solid black;
++}
++.page-size-select {
++    border: none;
++    border-bottom: 1px solid #3da9d9;
+ }
+\ No newline at end of file
+diff --git a/src/app/table-view/table-view.component.spec.ts b/src/app/table-view/table-view.component.spec.ts
+index 78bd1dc..f7190a4 100644
+--- a/src/app/table-view/table-view.component.spec.ts
++++ b/src/app/table-view/table-view.component.spec.ts
+@@ -1,4 +1,6 @@
++import { SimpleChange } from '@angular/core';
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
++import { FilterDataPipe } from '../filter-data.pipe';
+ 
+ import { TableViewComponent } from './table-view.component';
+ 
+@@ -8,7 +10,7 @@ describe('TableViewComponent', () => {
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      declarations: [ TableViewComponent ]
++      declarations: [ TableViewComponent, FilterDataPipe ]
+     })
+     .compileComponents();
+   });
+@@ -22,4 +24,47 @@ describe('TableViewComponent', () => {
+   it('should create', () => {
+     expect(component).toBeTruthy();
+   });
++
++  describe('ngOnChnages', () => {
++    it ('table should reflect input data from parent component', ()=> {
++      let record = [{"id": 1,
++      "gtin": 99014233738092,
++      "product_name": "Dimethicone, Avobenzone, Octinoxate, Octocrylene",
++      "product_desc": "Donec quis orci eget orci vehicula condimentum. Curabitur in libero ut massa volutpat convallis.",
++      "price": 90.18,
++      "currency": "CNY",
++      "category": "Nivea A Kiss of Recovery Medicated Lip Care",
++      "gender": "",
++      "quantity": 15,
++      "size": "",
++      "style": "architecture",
++      "color": "Purple",
++      "url": "http://fastcompany.com/ultrices/erat/tortor.js?a=condimentum&pede=id&posuere=luctus&nonummy=nec&integer=molestie&non=sed&velit=justo&donec=pellentesque&diam=viverra&neque=pede&vestibulum=ac&eget=diam&vulputate=cras&ut=pellentesque&ultrices=volutpat&vel=dui&augue=maecenas&vestibulum=tristique&ante=est&ipsum=et&primis=tempus&in=semper&faucibus=est&orci=quam&luctus=pharetra&et=magna&ultrices=ac&posuere=consequat&cubilia=metus&curae=sapien&donec=ut&pharetra=nunc",
++      "image": "http://dummyimage.com/249x203.jpg/ff4444/ffffff",
++      "image_additional": "http://dummyimage.com/157x160.jpg/ff4444/ffffff",
++      "additional": "test",
++      "source_video": "http://clips.vorwaerts-gmbh.de/big_buck_bunny.webm"}];
++      component.data = record;
++      fixture.detectChanges(); // to cover getID 
++      component.ngOnChanges(new SimpleChange(null, record, true));
++      expect(component.totalPage).toEqual(1);
++    }); 
++    it ('table should not reflect input data from parent component when input data is empty', ()=> {
++      let record: any = [];
++      component.data = record;
++      component.ngOnChanges(new SimpleChange(null, record, true));
++      expect(component.totalPage).toEqual(0);
++    }); 
++  });
++
++  it('changePage method should change page number for pagination', ()=> {
++    component.changePage(2);
++    expect(component.currentPage).toEqual(2);
++  });
++  it('change number of products per page', ()=> {
++    component.data = [{},{},{}];
++    component.changeRowsPerPage(2);
++    expect(component.rowsPerPage).toEqual(2);
++    expect(component.totalPage).toEqual(2);
++  });
+ });
+diff --git a/src/app/table-view/table-view.component.ts b/src/app/table-view/table-view.component.ts
+index 1a25373..8acc342 100644
+--- a/src/app/table-view/table-view.component.ts
++++ b/src/app/table-view/table-view.component.ts
+@@ -1,4 +1,4 @@
+-import { Component, Input, OnInit } from '@angular/core';
++import { Component, Input, OnInit, SimpleChange } from '@angular/core';
+ 
+ @Component({
+   selector: 'app-table-view',
+@@ -7,10 +7,31 @@ import { Component, Input, OnInit } from '@angular/core';
+ })
+ export class TableViewComponent implements OnInit {
+   @Input() data: any[] = [];
++  totalPage: number = 0;
++  rowsPerPage: number = 10;
++  currentPage: number = 1;
++  productCount: number[] = [10,20,50,100];
+ 
+   constructor() {}
+ 
+   ngOnInit(): void {
+-    console.log('Data', this.data);
++  }
++
++  ngOnChanges(change: SimpleChange) {
++    if (this.data.length) {
++      this.totalPage = Math.ceil(this.data.length / this.rowsPerPage); 
++    }
++  }
++  getId(index: number, element: any) {
++    return element.id ? element.id : element;
++  }
++
++  changePage(page: number) {
++    this.currentPage = page;
++  }
++
++  changeRowsPerPage(rows: any) {
++    this.rowsPerPage = rows;
++    this.totalPage = Math.ceil(this.data.length / this.rowsPerPage);
+   }
+ }
+diff --git a/src/styles.scss b/src/styles.scss
+index 90d4ee0..2d8afda 100644
+--- a/src/styles.scss
++++ b/src/styles.scss
+@@ -1 +1,7 @@
+ /* You can add global styles to this file, and also import other style files */
++.m-b-5 {
++    margin: 0 0 5px 0;
++}
++.p-10 {
++    padding: 10px;
++}
+\ No newline at end of file

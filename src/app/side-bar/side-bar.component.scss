@@ -1,0 +1,11 @@
+.side-bar-wrapper {
+    max-height: 520px;
+    overflow: auto;
+}
+select:disabled, select[disabled] {
+    cursor:not-allowed;
+}
+
+input:disabled, input[disabled] {
+    cursor:not-allowed;
+}

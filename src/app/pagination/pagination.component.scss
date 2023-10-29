@@ -1,0 +1,27 @@
+footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: lightgray;
+}
+.page-dropdown {
+    padding: 10px;
+}
+.page-change {
+    cursor: pointer;
+}
+li.disabled {
+    cursor: not-allowed;
+}
+tr:nth-child(2n) {
+    background-color: darkgray;
+}
+.table>thead {
+    vertical-align: middle;
+}
+ul {
+    max-height: 40px;
+}
+li {
+    overflow: auto;
+}

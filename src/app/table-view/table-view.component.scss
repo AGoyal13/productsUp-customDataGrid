@@ -1,0 +1,27 @@
+table {
+    td div{
+        max-width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    margin: 0;
+}
+th {
+    text-transform: uppercase;
+    text-align: center;
+    background-color: inherit;
+}
+td {
+    background-color: inherit;
+}
+.table-wrapper {
+    height: 520px;
+    overflow-x: scroll;
+    overflow-y: scroll;
+    border: 2px solid black;
+}
+.page-size-select {
+    border: none;
+    border-bottom: 1px solid #3da9d9;
+}

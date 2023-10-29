@@ -1,0 +1,27 @@
+.side-bar {
+    background-color: lightgray;
+    width: 20%;
+}
+.data-grid {
+    width: 75%;
+}
+.fl-container {
+    display: flex;
+    justify-content: center;
+    margin: 25px;
+}
+
+@media screen and (max-width: 425px) {
+    .fl-container {
+        display: flex;
+        flex-direction: column;
+    }
+    .side-bar {
+        background-color: lightgray;
+        width: 100%;
+    }
+    .data-grid {
+        width: 100%;
+    }
+}
+

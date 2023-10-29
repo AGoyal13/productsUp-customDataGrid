@@ -1,0 +1,64 @@
+<section class="table-wrapper">
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">gtin</th>
+                <th scope="col">product name</th>
+                <th scope="col">product desc</th>
+                <th scope="col">price</th>
+                <th scope="col">currency</th>
+                <th scope="col">category</th>
+                <th scope="col">gender</th>
+                <th scope="col">quantity</th>
+                <th scope="col">size</th>
+                <th scope="col">style</th>
+                <th scope="col">color</th>
+                <th scope="col">url</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of data | filterData : currentPage : rowsPerPage; trackBy: getId; let i = index">
+                <td scope="row">{{item.id}}</td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.gtin}}>
+                        {{item.gtin}}
+                    </div>
+                </td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.product_name}}>
+                        {{item.product_name}}
+                    </div>
+                </td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.product_desc}}>
+                        {{item.product_desc}}
+                    </div>
+                </td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.price}}>
+                        {{item.price}}
+                    </div>
+                </td>
+                <td>{{item.currency}}</td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.category}}>{{item.category}}
+                    </div>
+                </td>
+                <td>{{item.gender}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.size}}</td>
+                <td>{{item.style}}</td>
+                <td>{{item.color}}</td>
+                <td>
+                    <div data-toggle="tooltip" data-placement="right" title={{item.url}}>
+                        <a href={{item.url}}>
+                            {{item.url}}
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+<app-pagination [productCount]="productCount" [currentPage]="currentPage" [totalPage]="totalPage" (changePageNumber)="changePage($event)" (rowsPerPage)="changeRowsPerPage($event)"></app-pagination>
