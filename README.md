@@ -34,8 +34,7 @@ Bootstrap has been used for styling out certain components, Have just used the c
 2. App component is the bootstrap component which is further hosting Dashboard Component.
 3. Dashboard component is further having the Side Bar Component & Table View Component.
 4. All filter processing is being done as part of Side Bar component, whereas Table View Component is a dumb component which relies on data input from Dashboard component.
-5. Table View is utilizing an impure pipe for pagination implementation, it further has integration of Pagination component which has the Products per page count and navigation to next or previous pages.
-6. Reason for using impure pipe is because the data input for pipe is not changing rather the page count parameter is changing and we need to trigger data filtering for every change in page counter.
+5. Table View is utilizing an pure pipe for pagination implementation, it further has integration of Pagination component which has the Products per page count and navigation to next or previous pages.
 7. Test Cases for all Components, Pipes with 100% coverage is completed.
 8. Side Bar component is using Reactive Forms for multiple filter setup with help of Form Array in order to integrate validations.
 9. Entire project is responsive to different screen sizes.
